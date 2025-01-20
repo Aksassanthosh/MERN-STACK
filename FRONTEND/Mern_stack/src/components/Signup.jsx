@@ -1,94 +1,117 @@
-// Signup.jsx
 import React, { useState } from 'react';
-import { TextField, Button, Grid, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import axiosInstance from '../axiosinterceptor';
+import { Grid, Button, TextField, Card, CardContent, Typography } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+import axiosInstance from '../axiosInterceptor';
 
 const Signup = () => {
   const [form, setForm] = useState({
-    Name: '',
     Email: '',
     Password: '',
-    Phone: '',
-    Address: ''
+    confirmPassword: '',
   });
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = () => {
-    axiosInstance.post('http://localhost:5000/users/signup', form)
-      .then((res) => {
-        alert('Registration successful');
-      })
-      .catch((error) => {
-        alert('Registration failed');
-      });
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async () => {
+    if (form.Password !== form.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    try {
+      const response = await axiosInstance.post('http://localhost:5000/users/adduser', form); // API base URL is managed in axiosInterceptor
+      alert(response.data.message); // Assuming the backend sends a 'message' field
+      setForm({ Email: '', Password: '', confirmPassword: '' }); // Reset form
+      navigate('/'); // Navigate to login page
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || 'Failed to Signup. Please try again.');
+    }
   };
 
   return (
-    <div style={{ margin: '10%' }}>
-      <Typography variant="h4" style={{ color: 'purple' }}>Signup</Typography>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextField
-            label="Name"
-            variant="outlined"
-            fullWidth
-            value={form.Name}
-            onChange={(e) => setForm({ ...form, Name: e.target.value })}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="Email"
-            variant="outlined"
-            fullWidth
-            value={form.Email}
-            onChange={(e) => setForm({ ...form, Email: e.target.value })}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="Password"
-            variant="outlined"
-            type="password"
-            fullWidth
-            value={form.Password}
-            onChange={(e) => setForm({ ...form, Password: e.target.value })}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="Phone"
-            variant="outlined"
-            fullWidth
-            value={form.Phone}
-            onChange={(e) => setForm({ ...form, Phone: e.target.value })}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="Address"
-            variant="outlined"
-            fullWidth
-            multiline
-            rows={4}
-            value={form.Address}
-            onChange={(e) => setForm({ ...form, Address: e.target.value })}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-          >
-            Signup
-          </Button>
-        </Grid>
-      </Grid>
-      <div>
-        <Link to="/">Already have an account? Login here</Link>
-      </div>
+    <div style={{ margin: '5%' }}>
+      <Card sx={{ boxShadow: 3, padding: 3, maxWidth: 500, margin: 'auto' }}>
+        <CardContent>
+          <Typography variant="h5" gutterBottom sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+            Create an Account
+          </Typography>
+
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Email"
+                name="Email"
+                value={form.Email}
+                onChange={handleChange}
+                variant="outlined"
+                sx={{ marginBottom: 2 }}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Password"
+                name="Password"
+                type="Password"
+                value={form.Password}
+                onChange={handleChange}
+                variant="outlined"
+                sx={{ marginBottom: 2 }}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Confirm Password"
+                name="confirmPassword"
+                type="password"
+                value={form.confirmPassword}
+                onChange={handleChange}
+                variant="outlined"
+                sx={{ marginBottom: 2 }}
+              />
+            </Grid>
+
+            {error && (
+              <Grid item xs={12}>
+                <Typography color="error" sx={{ textAlign: 'center', marginBottom: 2 }}>
+                  {error}
+                </Typography>
+              </Grid>
+            )}
+
+            <Grid item xs={12} sx={{ textAlign: 'center' }}>
+              <Button
+                color="primary"
+                variant="contained"
+                size="large"
+                onClick={handleSubmit}
+                sx={{
+                  width: '100%',
+                  padding: '12px 0',
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                }}
+              >
+                Register
+              </Button>
+            </Grid>
+
+            <Grid item xs={12} sx={{ textAlign: 'center', marginTop: 2 }}>
+              <Link to={'/'} style={{ color: 'blue', textDecoration: 'none' }}>
+                Already Registered? Login here
+              </Link>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
     </div>
   );
 };

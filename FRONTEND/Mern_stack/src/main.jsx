@@ -1,14 +1,14 @@
 // Main.jsx
-import React from 'react';
-import Navbar from './components/Navbar';
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+import { BrowserRouter } from 'react-router-dom'
 
-const Main = ({ child }) => {
-  return (
-    <div>
-      <Navbar />
-      {child}
-    </div>
-  );
-};
-
-export default Main;
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </StrictMode>,
+)

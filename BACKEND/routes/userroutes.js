@@ -1,37 +1,47 @@
-const express = require('express');
-const router = express.Router();
-const User = require('../model/usermodel');
-const jwt = require('jsonwebtoken');
-const Employee = require('../model/employeemodel');
+const express = require('express')
+const router = express.Router()
 
-// User Login
-router.post('/login', async (req, res) => {
-    const { Email, Password } = req.body;
+router.use(express.json())
 
+const userModel = require('../model/usermodel')
+const jwt = require('jsonwebtoken')
+
+router.post('/login', async (req,res) =>{
+    const user = await userModel.findOne({Email:req.body.Email});
+    if(!user){
+        res.status(404).send({message:'User not found'});
+    }
     try {
-        const user = await User.findOne({ Email });
-        if (!user) return res.status(404).send({ message: 'User not found' });
-
-        if (user.Password === Password) {
-            const payload = { Email: user.Email, Role: user.Role };
-            const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-            res.status(200).send({ message: 'Login successful', token });
-        } else {
-            res.status(400).send({ message: 'Invalid credentials' });
+        if(user.Password == req.body.Password){
+            const payload = {Email:user.Email,Password:user.Password, role:user.role};
+            const token = jwt.sign(payload,'employeeApp')
+            res.status(200).send({message:'Login successful',token:token})
+        }
+        else{
+            res.status(400).send({message:'Invalid credentials'})
         }
     } catch (error) {
-        res.status(500).send({ message: 'Error logging in' });
+        console.log(error);
     }
-});
+})
 
-// View Employees (Users Only)
-router.get('/employees', async (req, res) => {
+router.post('/adduser', async (req, res) =>{
+    const {Email, Password} = req.body;
     try {
-        const employees = await Employee.find();
-        res.status(200).send(employees);
+        const existingUser = await userModel.findOne({ Email });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+        const newUser = new userModel({
+            Email,
+            Password,
+            role: 'Employee',
+        });
+        await newUser.save();
+        res.status(201).json({ message: 'User created successfully'});
     } catch (error) {
-        res.status(500).send({ message: 'Error retrieving employees' });
+        res.status(500).json({ message: 'Failed to create' });
     }
-});
+})
 
 module.exports = router;

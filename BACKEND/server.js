@@ -1,18 +1,18 @@
 const express = require('express');
 const cors = require('cors');
-const morgan = require('morgan');
+
 require('dotenv').config();
 require('./db/connection');
 
-const adminRoutes = require('./routes/adminroutes');
+const employeeRoutes = require('./routes/employeeroutes');
 const userRoutes = require('./routes/userroutes');
 
-const app = express();
+const app =new express();
 app.use(cors());
-app.use(morgan('dev'));
+
 app.use(express.json());
 
-app.use('/admin', adminRoutes);
+app.use('/employees', employeeRoutes);
 app.use('/users', userRoutes);
 
 const PORT = process.env.PORT || 5000;
