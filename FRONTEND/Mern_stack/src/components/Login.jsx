@@ -31,8 +31,8 @@ const Login = () => {
     }
 
   return (
-    <div style={{margin:'10%'}}>
-        <Typography variant='h3'style={{color: 'blue'}}>Login</Typography><br></br><br></br>
+    <div style={{margin:'40%'}}>
+        <Typography variant='h3'style={{color: 'grey'}}>Login</Typography><br></br><br></br>
         <TextField label='Email' variant='outlined' name="Email" onChange={(e)=>{
           setForm({...form,Email:e.target.value})
         }}></TextField><br></br><br></br>
