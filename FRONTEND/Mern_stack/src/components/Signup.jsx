@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Grid, Button, TextField, Card, CardContent, Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import axiosInstance from '../axiosinterceptor';
+import axiosInstance from '../axiosInterceptor';
 
 const Signup = () => {
   const [form, setForm] = useState({
